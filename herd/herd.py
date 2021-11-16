@@ -147,14 +147,14 @@ def transfer(host, local_file, remote_target, retry=0):
         scp(host, herd_py, '%s/herd.py' % rp)
     log.info("Copying %s to %s:%s" % (local_file, host, remote_file))
     scp(host, local_file, remote_file)
-    command = 'python %s/murder_client.py peer %s %s' % (
+    command = 'python2 %s/murder_client.py peer %s %s' % (
         rp,
         remote_file,
         remote_target)
     log.info("running \"%s\" on %s", command, host)
     result = ssh(host, command)
     if result == 0:
-        cmd = 'python %s/herd.py %s %s --seed True' % (
+        cmd = 'python2 %s/herd.py %s %s --seed True' % (
             rp,
             remote_file,
             remote_target)
@@ -179,7 +179,7 @@ def ssh(host, command):
             '-o ServerAliveInterval=60',
             '-o TCPKeepAlive=yes',
             '-o LogLevel=quiet',
-            '-o StrictHostKeyChecking=no',
+            '-o StrictHostKeyChecking=accept-new',
             host, command], stdout=log,
             stderr=log)
     return result
@@ -188,7 +188,7 @@ def ssh(host, command):
 def scp(host, local_file, remote_file):
     return subprocess.call([
         'scp', '-o UserKnownHostsFile=/dev/null',
-        '-o StrictHostKeyChecking=no',
+        '-o StrictHostKeyChecking=accept-new',
         local_file, '%s:%s' % (host, remote_file)],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
